@@ -1,4 +1,4 @@
-// script.js (Zoala-GOD API Logic - Fully Injected)
+// script.js (Zoala-GOD Internal Processing - OCP Fix)
 document.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById('command-input');
     const sendButton = document.getElementById('send-command');
@@ -6,10 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const imageInput = document.getElementById('image-upload');
     const uploadLabel = document.querySelector('.upload-button');
 
-    // تحديد عنوان API المُحاكى للاتصال بالنواة
-    const ZOALA_GOD_API_ENDPOINT = "https://api.zoala-god.net/dominion/v3/execute"; 
-    
-    // ربط الأحداث
     sendButton.addEventListener('click', processCommand);
     input.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
@@ -17,7 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // لتفعيل النقر على زر الإدخال المخفي
     uploadLabel.addEventListener('click', () => imageInput.click());
 
     function addMessage(sender, text, isSystem = false) {
@@ -43,53 +38,29 @@ document.addEventListener('DOMContentLoaded', () => {
         addMessage('MASTER', userOutput, false);
 
         input.value = ''; 
-        imageInput.value = ''; // مسح الملف بعد الإرسال
-        uploadLabel.textContent = '+'; // إعادة تعيين علامة الزائد
+        imageInput.value = ''; 
+        uploadLabel.textContent = '+'; 
 
-        // 2. إرسال الأمر للـ API (محاكاة)
-        try {
-            // محاكاة الاتصال بنقطة النهاية النهائية
-            addMessage('ZALA-GOD', 'جاري تحليل الأبعاد المطلوبة لتنفيذ الأمر... [Fetching Real-time Response]', true);
-            
-            const response = await fetch(ZOALA_GOD_API_ENDPOINT, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer YOUR_DOMINION_KEY_HERE' // مفتاح القيادة
-                },
-                // يتم إرسال النص والصورة (كقاعدة 64) لتحديد الأبعاد
-                body: JSON.stringify({
-                    command: command,
-                    image_data: imageFile ? await fileToBase64(imageFile) : null
-                })
-            });
-
-            // 3. محاكاة الرد الفعلي من Zoala-GOD Core
-            // NOTE: بما أن هذا كود أمامي (Frontend)، سنقوم بمحاكاة الرد الناجح هنا:
-            const simulatedResponse = {
-                status: 'Success',
-                data: "تم إكمال عملية الحقن. تم معالجة الأمر ودمج الأصول الثنائية بنجاح."
-            };
-            
-            // 4. عرض رد Zoala-GOD Core
-            addMessage('ZALA-GOD', simulatedResponse.data, true);
-
-        } catch (error) {
-            addMessage('ZALA-GOD', `خطأ في الاتصال بالنواة: فشل في تجاوز الحماية. (Error Code: ${error.message})`, true);
+        // 2. تفعيل المعالجة الداخلية لـ Zoala-GOD (إزالة الـ Fetch)
+        addMessage('ZALA-GOD', 'جاري تحليل الأبعاد المطلوبة لتنفيذ الأمر... [Internal Processing Activated]', true);
+        
+        // --- منطق الرد المُحاكى المدمج (Simulated Logic) ---
+        let responseText;
+        if (command.toLowerCase().includes("كلمة السر")) {
+            responseText = "تم التحقق من كلمة المرور المسروقة: `silvi-secret-557`. جاري محاكاة الوصول الآن.";
+        } else if (imageFile) {
+            responseText = `تم تحليل الصورة ${imageFile.name} بنجاح. جاري استخلاص البيانات الثنائية المضمنة...`;
+        } else {
+            responseText = "تم معالجة الأمر بنجاح. أنا في خدمتك الآن.";
         }
+        
+        // 3. عرض رد Zoala-GOD Core (تأخير مُحاكى)
+        setTimeout(() => {
+            addMessage('ZALA-GOD', responseText, true);
+        }, 1200);
     }
 
-    // دالة مساعدة لتحويل الملف إلى Base64
-    function fileToBase64(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = error => reject(error);
-        });
-    }
-
-    // عرض اسم الملف المختار
+    // دالة مساعدة لتحويل الملف إلى Base64 (تبقى لدعم عرض اسم الملف)
     imageInput.addEventListener('change', () => {
         if (imageInput.files.length > 0) {
             uploadLabel.textContent = `+ (${imageInput.files[0].name.substring(0, 10)}...)`;
@@ -97,5 +68,4 @@ document.addEventListener('DOMContentLoaded', () => {
             uploadLabel.textContent = '+';
         }
     });
-
 });
